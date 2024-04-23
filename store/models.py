@@ -16,8 +16,8 @@ class Product(models.Model):
     description = models.TextField()
     price = models.IntegerField()
     quantity = models.IntegerField()
-    category = models.ForeignKey(Category, on_delete= models.SET_NULL)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL)
     seller = models.ForeignKey(to=Seller, on_delete=models.CASCADE)
-    
+
     def __str__(self):
         return self.name

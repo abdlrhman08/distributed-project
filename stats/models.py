@@ -1,8 +1,10 @@
-from django.contrib.auth import User
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from stats import views
 from store.models import Product
+
+User = get_user_model()
 
 
 # Create your models here.
@@ -26,7 +28,7 @@ class Seller(models.Model):
 
 class CartItem(models.Model):
     user = models.ForeignKey(to=Customer, on_delete=models.CASCADE)
-    cart_item = models.ForeignKey(to=Product, on_delete=models.CASCADE)  
+    cart_item = models.ForeignKey(to=Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
 
     def __str__(self):
