@@ -21,4 +21,11 @@ class OrderItems(models.Model):
     quantity = models.IntegerField()
 
     def __str__(self):
-        return "order ID: " + self.order.id + ", item: " + self.product.name + ", qty: " + self.quantity
+        return (
+            "order ID: "
+            + self.order.id
+            + ", item: "
+            + self.product.name
+            + ", qty: "
+            + self.quantity
+        )
