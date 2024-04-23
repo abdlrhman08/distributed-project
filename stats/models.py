@@ -6,12 +6,12 @@ User = get_user_model()
 
 # Create your models here.
 class Customer(models.Model):
-    user_id = models.OneToOneField(to=User, primary_key=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(to=User, primary_key=True, on_delete=models.CASCADE)
     address = models.CharField(max_length=150)
     wishlist = models.ManyToManyField(to="store.product")
 
     def __str__(self):
-        return "Customer: " + self.name
+        return "Customer: " + self.user.username
 
 
 class Seller(models.Model):
@@ -29,20 +29,17 @@ class CartItem(models.Model):
     quantity = models.IntegerField()
 
     def __str__(self):
-        return self.name + "'s cart"
+        return self.user.username + "'s cart"
 
 
 class Stats(models.Model):
-    product_id = models.OneToOneField(
-        to="store.product", primary_key=True, on_delete=models.DO_NOTHING
+    product = models.OneToOneField(
+        to="store.product", primary_key=True, on_delete=models.CASCADE
     )
     views = models.IntegerField()
     rating = models.IntegerField()
     likes = models.IntegerField()
     dislikes = models.IntegerField()
-
-    def __str__(self):
-        return self.name
 
 
 class Comment(models.Model):
