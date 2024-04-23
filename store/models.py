@@ -1,7 +1,5 @@
 from django.db import models
 
-from stats.models import Seller
-
 
 # Create your models here.
 class Category(models.Model):
@@ -16,8 +14,8 @@ class Product(models.Model):
     description = models.TextField()
     price = models.IntegerField()
     quantity = models.IntegerField()
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL)
-    seller = models.ForeignKey(to=Seller, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    seller = models.ForeignKey(to="stats.seller", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

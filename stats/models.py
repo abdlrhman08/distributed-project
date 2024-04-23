@@ -1,24 +1,21 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from stats import views
-from store.models import Product
-
 User = get_user_model()
 
 
 # Create your models here.
 class Customer(models.Model):
-    user_id = models.OneToOneField(to=User, primary_key=True)
+    user_id = models.OneToOneField(to=User, primary_key=True, on_delete=models.CASCADE)
     address = models.CharField(max_length=150)
-    wishlist = models.ManyToManyField(to=Product)
+    wishlist = models.ManyToManyField(to="store.product")
 
     def __str__(self):
         return "Customer: " + self.name
 
 
 class Seller(models.Model):
-    user = models.OneToOneField(to=User, primary_key=True)
+    user = models.OneToOneField(to=User, primary_key=True, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=50)
     location = models.CharField(max_length=150)
 
@@ -28,7 +25,7 @@ class Seller(models.Model):
 
 class CartItem(models.Model):
     user = models.ForeignKey(to=Customer, on_delete=models.CASCADE)
-    cart_item = models.ForeignKey(to=Product, on_delete=models.CASCADE)
+    cart_item = models.ForeignKey(to="store.product", on_delete=models.CASCADE)
     quantity = models.IntegerField()
 
     def __str__(self):
@@ -36,18 +33,20 @@ class CartItem(models.Model):
 
 
 class Stats(models.Model):
-    product_id = models.OneToOneField(to=Product, primary_key=True)
+    product_id = models.OneToOneField(
+        to="store.product", primary_key=True, on_delete=models.DO_NOTHING
+    )
     views = models.IntegerField()
     rating = models.IntegerField()
     likes = models.IntegerField()
     dislikes = models.IntegerField()
 
     def __str__(self):
-        return self.name + "'s view = " + views
+        return self.name
 
 
 class Comment(models.Model):
     stats = models.ForeignKey(to=Stats, on_delete=models.CASCADE)
-    author = models.ForeignKey(to=User, on_delete=models.SET_NULL)
+    author = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     comment = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
