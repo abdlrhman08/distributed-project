@@ -2,9 +2,11 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from rest_framework.authentication import BaseAuthentication, authenticate
 from rest_framework.exceptions import AuthenticationFailed
 
+User = get_user_model()
 
 class JWToken:
     """
@@ -53,8 +55,10 @@ class JWToken:
 
 class JWTAuthenticator(BaseAuthentication):
     def authenticate(self, request):
-        pass
-
+        token  = self._get_token(request)
+        user = User.objects.get(id=token.user_id)
+        
+        return user, token
     def _get_token(self, request):
         token_header: str = request.headers.get("Authorization", None)
         if not token_header:

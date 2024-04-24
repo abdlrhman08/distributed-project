@@ -1,12 +1,11 @@
+from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView, Response
 
-from authentication.authenticator import JWToken
-
+from .authenticator import JWToken
 from .mixins import RestrictedViewMixin
 from .serializers import CredientalsSerializer
 
 
-# TODO: figure oute a better name 
 class AuthenticateUserView(APIView):
     def post(self, request, format=None):
         user_credientals = CredientalsSerializer(data=request.data)
@@ -15,13 +14,14 @@ class AuthenticateUserView(APIView):
             password = user_credientals.validated_data["password"]
             
             access_token = JWToken.get_for_user(username, password)
+            
+            return Response({ "token": str(access_token) })
 
-            return Response(str(access_token))
-
-        return Response("Invalid Credientals")
+        return Response({ "details": "Invalid form"}, status=HTTP_400_BAD_REQUEST)
 
 class RegisterUserView(APIView):
-    pass
+    def post(self, request):
+        pass
 
 class DummyView(RestrictedViewMixin, APIView):
     def get(self, request):
