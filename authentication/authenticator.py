@@ -2,11 +2,11 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth.backends import BaseBackend
+from django.contrib.auth.models import User
 from rest_framework.authentication import BaseAuthentication, authenticate
 from rest_framework.exceptions import AuthenticationFailed
 
-User = get_user_model()
 
 class JWToken:
     """
@@ -38,8 +38,8 @@ class JWToken:
         return self.encoded_token
 
     @classmethod
-    def get_for_user(cls, username, password):
-        user = authenticate(username=username, password=password)
+    def get_for_user(cls, email, password):
+        user = authenticate(email=email, password=password)
         if not user:
             raise AuthenticationFailed
         
@@ -52,6 +52,22 @@ class JWToken:
         return cls_instance
 
 
+class EmailAuthenticationBackend(BaseBackend):
+    def authenticate(self, request, email=None, password=None):
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return None
+
+        if user.check_password(password):
+            return user
+        return None
+
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return None
 
 class JWTAuthenticator(BaseAuthentication):
     def authenticate(self, request):

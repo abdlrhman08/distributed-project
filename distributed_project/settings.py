@@ -22,6 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-uh$t_v)xo310n4sus0dd$u+$lj1ayr!0#8b3zj422w-8=4d^^*"
 ALGORITHM = "HS256"
+
+AUTHENTICATION_BACKENDS = ["authentication.authenticator.EmailAuthenticationBackend"]
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
