@@ -10,7 +10,7 @@ from rest_framework.exceptions import AuthenticationFailed
 
 class JWToken:
     """
-        Token wrapper class
+    Token wrapper class
     """
 
     def __init__(self, token=None):
@@ -42,13 +42,15 @@ class JWToken:
         user = authenticate(email=email, password=password)
         if not user:
             raise AuthenticationFailed
-        
+
         cls_instance = cls()
         cls_instance._token = {
             "user_id": user.id,
-            "exp": datetime.now(tz=timezone.utc) + timedelta(hours=24)
+            "exp": datetime.now(tz=timezone.utc) + timedelta(hours=24),
         }
-        cls_instance.encoded_token = jwt.encode(cls_instance._token, settings.SECRET_KEY, settings.ALGORITHM)
+        cls_instance.encoded_token = jwt.encode(
+            cls_instance._token, settings.SECRET_KEY, settings.ALGORITHM
+        )
         return cls_instance
 
 
@@ -69,12 +71,14 @@ class EmailAuthenticationBackend(BaseBackend):
         except User.DoesNotExist:
             return None
 
+
 class JWTAuthenticator(BaseAuthentication):
     def authenticate(self, request):
-        token  = self._get_token(request)
+        token = self._get_token(request)
         user = User.objects.get(id=token.user_id)
-        
+
         return user, token
+
     def _get_token(self, request):
         token_header: str = request.headers.get("Authorization", None)
         if not token_header:

@@ -14,7 +14,9 @@ class CredientalsSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=50, required=True)
     last_name = serializers.CharField(max_length=50, required=True)
-    email = serializers.EmailField(required=True, validators=[UniqueValidator(User.objects.all())])
+    email = serializers.EmailField(
+        required=True, validators=[UniqueValidator(User.objects.all())]
+    )
 
     class Meta:
         model = User

@@ -13,10 +13,11 @@ class AuthenticateUserView(APIView):
             email = user_credientals.validated_data["email"]
             password = user_credientals.validated_data["password"]
             access_token = JWToken.get_for_user(email, password)
-            
-            return Response({ "token": str(access_token) })
 
-        return Response({ "details": "Invalid form"}, status=HTTP_406_NOT_ACCEPTABLE)
+            return Response({"token": str(access_token)})
+
+        return Response({"details": "Invalid form"}, status=HTTP_406_NOT_ACCEPTABLE)
+
 
 class RegisterUserView(APIView):
     def post(self, request):
@@ -25,12 +26,11 @@ class RegisterUserView(APIView):
             user_serializer.save()
             return Response(status=HTTP_201_CREATED)
 
-        return Response({ "details": "Invalid form" }, status=HTTP_406_NOT_ACCEPTABLE)
+        return Response({"details": "Invalid form"}, status=HTTP_406_NOT_ACCEPTABLE)
+
 
 class DummyView(RestrictedViewMixin, APIView):
     def get(self, request):
-        content = {
-            "details": "Hello, this is a restricted end point"
-        }
+        content = {"details": "Hello, this is a restricted end point"}
 
         return Response(content)
