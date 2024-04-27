@@ -14,8 +14,23 @@ class Product(models.Model):
     description = models.TextField()
     price = models.IntegerField()
     quantity = models.IntegerField()
+    specs = models.JSONField(null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     seller = models.ForeignKey(to="stats.seller", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
+
+
+class Color(models.Model):
+    name = models.CharField(max_length=50)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Image(models.Model):
+    link = models.CharField(max_length=250)
+    product = models.ForeignKey(to=Product, on_delete=models.CASCADE)
+    color = models.ForeignKey(to=Color, on_delete=models.CASCADE, null=True)
