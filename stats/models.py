@@ -36,14 +36,19 @@ class Stats(models.Model):
     product = models.OneToOneField(
         to="store.product", primary_key=True, on_delete=models.CASCADE
     )
-    views = models.IntegerField()
-    rating = models.IntegerField()
-    likes = models.IntegerField()
-    dislikes = models.IntegerField()
+    views = models.IntegerField(default=0)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    likes = models.IntegerField(default=0)
+    dislikes = models.IntegerField(default=0)
+
+    def __str__(self):
+        return "Product: " + self.product.name + ", rating: " + self.rating
 
 
 class Comment(models.Model):
     stats = models.ForeignKey(to=Stats, on_delete=models.CASCADE)
     author = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    title = models.CharField(max_length=150)
     comment = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
