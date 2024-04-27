@@ -24,8 +24,10 @@ class Seller(models.Model):
 
 
 class CartItem(models.Model):
-    user = models.ForeignKey(to=Customer, on_delete=models.CASCADE)
-    cart_item = models.ForeignKey(to="store.product", on_delete=models.CASCADE)
+    user = models.ForeignKey(to=Customer, on_delete=models.CASCADE, null=True)
+    cart_item = models.ForeignKey(
+        to="store.product", on_delete=models.CASCADE, null=True
+    )
     quantity = models.IntegerField()
 
     def __str__(self):
@@ -46,9 +48,9 @@ class Stats(models.Model):
 
 
 class Comment(models.Model):
-    stats = models.ForeignKey(to=Stats, on_delete=models.CASCADE)
+    stats = models.ForeignKey(to=Stats, on_delete=models.CASCADE, null=True)
     author = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
-    title = models.CharField(max_length=150)
+    title = models.CharField(max_length=150, null=True)
     comment = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)

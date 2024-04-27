@@ -17,7 +17,7 @@ class Product(models.Model):
     quantity = models.IntegerField()
     specs = models.JSONField(null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-    seller = models.ForeignKey(to="stats.seller", on_delete=models.CASCADE)
+    seller = models.ForeignKey(to="stats.seller", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
