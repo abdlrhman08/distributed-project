@@ -19,8 +19,6 @@ class CategorySerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "products_number", "example_products"]
 
     def get_example_products(self, obj):
-        example_products = obj.product_set.all()[:self.context["n_products"]]
+        example_products = obj.product_set.all()[: self.context["n_products"]]
         serialized_data = ProductSerlializer(example_products, many=True)
         return serialized_data.data
-
-        

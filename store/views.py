@@ -1,7 +1,10 @@
 from rest_framework import generics
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 
+from authentication.authenticator import JWTAuthenticator
+
 from .models import Category, Product
+from .permissions import IsSellerOrReadOnly
 from .serializers import CategorySerializer, ProductSerlializer
 
 
@@ -16,6 +19,8 @@ class CategoriesListView(generics.ListAPIView):
 
 
 class ProductView(RetrieveModelMixin, ListModelMixin, generics.CreateAPIView):
+    authentication_classes = [JWTAuthenticator]
+    permission_classes = [IsSellerOrReadOnly]
     serializer_class = ProductSerlializer
 
     def get_queryset(self):

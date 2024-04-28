@@ -1,9 +1,8 @@
-from drf_spectacular.utils import extend_schema
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_201_CREATED, HTTP_406_NOT_ACCEPTABLE
 from rest_framework.views import APIView, Response
 
-from .authenticator import JWToken
-from .mixins import RestrictedViewMixin
+from .authenticator import JWTAuthenticator, JWToken
 from .serializers import CredientalsSerializer, UserSerializer
 
 
@@ -34,7 +33,10 @@ class RegisterUserView(APIView):
         return Response({"details": "Invalid form"}, status=HTTP_406_NOT_ACCEPTABLE)
 
 
-class DummyView(RestrictedViewMixin, APIView):
+class DummyView(APIView):
+    authentication_classes = [JWTAuthenticator]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         content = {"details": "Hello, this is a restricted end point"}
 
