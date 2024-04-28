@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_201_CREATED, HTTP_406_NOT_ACCEPTABLE
@@ -40,6 +41,12 @@ class RegisterSellerView(generics.CreateAPIView):
     serializer_class = SellerSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        seller_group = Group.objects.get(name="Sellers")
+        request.user.groups.add(seller_group)
+
+        return super().post(request, *args, **kwargs)
 
 
 class DummyView(APIView):
