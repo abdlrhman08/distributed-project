@@ -47,5 +47,3 @@ class RegisterSellerView(generics.CreateAPIView):
         request.user.groups.add(seller_group)
 
         return super().post(request, *args, **kwargs)
-
-
