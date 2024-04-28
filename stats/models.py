@@ -24,7 +24,7 @@ class Seller(models.Model):
 
 
 class CartItem(models.Model):
-    user = models.ForeignKey(to=Customer, on_delete=models.CASCADE, null=True)
+    customer = models.ForeignKey(to=Customer, on_delete=models.CASCADE, null=True)
     cart_item = models.ForeignKey(
         to="store.product", on_delete=models.CASCADE, null=True
     )

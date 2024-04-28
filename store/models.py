@@ -13,7 +13,7 @@ class Product(models.Model):
     thumbnail = models.CharField(max_length=250)
     name = models.CharField(max_length=150)
     description = models.TextField()
-    price = models.IntegerField()
+    price = models.DecimalField(max_digits=6, decimal_places=2)
     quantity = models.IntegerField()
     specs = models.JSONField(null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
