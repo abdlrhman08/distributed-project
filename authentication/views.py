@@ -1,6 +1,9 @@
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_201_CREATED, HTTP_406_NOT_ACCEPTABLE
 from rest_framework.views import APIView, Response
+
+from stats.serializers import SellerSerializer
 
 from .authenticator import JWTAuthenticator, JWToken
 from .serializers import CredientalsSerializer, UserSerializer
@@ -31,6 +34,12 @@ class RegisterUserView(APIView):
             return Response(status=HTTP_201_CREATED)
 
         return Response({"details": "Invalid form"}, status=HTTP_406_NOT_ACCEPTABLE)
+
+
+class RegisterSellerView(generics.CreateAPIView):
+    serializer_class = SellerSerializer
+    authentication_classes = [JWTAuthenticator]
+    permission_classes = [IsAuthenticated]
 
 
 class DummyView(APIView):
