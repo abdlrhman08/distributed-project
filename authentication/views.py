@@ -49,11 +49,3 @@ class RegisterSellerView(generics.CreateAPIView):
         return super().post(request, *args, **kwargs)
 
 
-class DummyView(APIView):
-    authentication_classes = [JWTAuthenticator]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        content = {"details": "Hello, this is a restricted end point"}
-
-        return Response(content)
