@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.generics import (
+    ListAPIView,
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
@@ -11,9 +12,19 @@ from authentication.authenticator import JWTAuthenticator
 from stats.serializers import (
     CartItemListCreateSerializer,
     CartItemUpdateDeleteSerializer,
+    SellerSerializer,
 )
 
-from .models import CartItem
+from .models import CartItem, Seller
+
+
+class SellerListView(ListAPIView):
+    serializer_class = SellerSerializer
+
+    def get_queryset(self):
+        number = int(self.request.query_params.get("n", 10))
+        queryset = Seller.objects.all()[:number]
+        return queryset
 
 
 class CartItemListView(ListCreateAPIView):
