@@ -10,7 +10,6 @@ from rest_framework.views import APIView
 from authentication.authenticator import JWTAuthenticator
 from stats.serializers import (
     CartItemListCreateSerializer,
-    CartItemUpdateDeleteSerializer,
     SellerSerializer,
 )
 

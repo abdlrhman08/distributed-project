@@ -40,9 +40,6 @@ class CartItemListCreateSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ["id", "customer", "product", "quantity"]
         read_only_fields = ["id"]
-        extra_kwargs = {
-            "product": {"required": False, "allow_null": False}
-        }
 
     def validate(self, data):
         if data["quantity"] <= 0:
@@ -53,8 +50,8 @@ class CartItemListCreateSerializer(serializers.ModelSerializer):
         return data
 
 
-class CartItemUpdateDeleteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CartItem
-        fields = ["id", "customer", "product", "quantity"]
-        read_only_fields = ["id", "customer", "product"]
+# class CartItemUpdateDeleteSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = CartItem
+#         fields = ["id", "customer", "product", "quantity"]
+#         read_only_fields = ["id", "customer", "product"]
