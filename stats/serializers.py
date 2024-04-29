@@ -39,12 +39,18 @@ class CartItemListCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ["id", "customer", "product", "quantity"]
-        read_only_fields = ["id", "customer"]
+        read_only_fields = ["id"]
+        extra_kwargs = {
+            "product": {"required": False, "allow_null": False}
+        }
 
-    def create(self, validated_data):
-        validated_data["customer"] = self.context["request"].user.customer
-        obj = CartItem.objects.create(**validated_data)
-        return obj
+    def validate(self, data):
+        if data["quantity"] <= 0:
+            raise serializers.ValidationError(
+                {"details": "Product quantity must be greater than 0"}
+            )
+
+        return data
 
 
 class CartItemUpdateDeleteSerializer(serializers.ModelSerializer):
