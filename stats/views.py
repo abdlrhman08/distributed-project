@@ -16,6 +16,7 @@ from stats.serializers import (
 )
 
 from .models import CartItem, Seller
+from .permissions import IsCustomerAndAuthenticated
 
 
 class SellerListView(ListAPIView):
@@ -30,7 +31,7 @@ class SellerListView(ListAPIView):
 class CartItemListView(ListCreateAPIView):
     serializer_class = CartItemListCreateSerializer
     authentication_classes = [JWTAuthenticator]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomerAndAuthenticated]
 
     def get_queryset(self):
         customer = self.request.user
@@ -43,12 +44,12 @@ class CartItemDetailView(RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemUpdateDeleteSerializer
     queryset = CartItem.objects.all()
     authentication_classes = [JWTAuthenticator]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomerAndAuthenticated]
 
 
 class CartDeleteView(APIView):
     authentication_classes = [JWTAuthenticator]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomerAndAuthenticated]
 
     def delete(self, request, *args, **kwargs):
         customer = self.request.user.customer
