@@ -14,7 +14,7 @@ class Order(models.Model):
     products = models.ManyToManyField(to="store.product", through="OrderItems")
 
     def __str__(self):
-        return self.customer.username + "'s order ID " + self.id
+        return "hey"
 
 
 class OrderItems(models.Model):
