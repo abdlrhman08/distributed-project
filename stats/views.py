@@ -4,7 +4,6 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -16,7 +15,7 @@ from stats.serializers import (
 )
 
 from .models import CartItem, Seller
-from .permissions import IsCustomerAndAuthenticated
+from .permissions import IsCorrectCustomer, IsCustomerAndAuthenticated
 
 
 class SellerListView(ListAPIView):
@@ -31,7 +30,7 @@ class SellerListView(ListAPIView):
 class CartItemListView(ListCreateAPIView):
     serializer_class = CartItemListCreateSerializer
     authentication_classes = [JWTAuthenticator]
-    permission_classes = [IsCustomerAndAuthenticated]
+    permission_classes = [IsCustomerAndAuthenticated & IsCorrectCustomer]
 
     def get_queryset(self):
         customer = self.request.user
@@ -41,15 +40,15 @@ class CartItemListView(ListCreateAPIView):
 
 # Make it update / delete only
 class CartItemDetailView(RetrieveUpdateDestroyAPIView):
-    serializer_class = CartItemUpdateDeleteSerializer
+    serializer_class = CartItemListCreateSerializer
     queryset = CartItem.objects.all()
     authentication_classes = [JWTAuthenticator]
-    permission_classes = [IsCustomerAndAuthenticated]
+    permission_classes = [IsCustomerAndAuthenticated & IsCorrectCustomer]
 
 
 class CartDeleteView(APIView):
     authentication_classes = [JWTAuthenticator]
-    permission_classes = [IsCustomerAndAuthenticated]
+    permission_classes = [IsCustomerAndAuthenticated & IsCorrectCustomer]
 
     def delete(self, request, *args, **kwargs):
         customer = self.request.user.customer

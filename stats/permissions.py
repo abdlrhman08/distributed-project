@@ -9,3 +9,13 @@ class IsCustomerAndAuthenticated(BasePermission):
                 and request.user.has_perm("stats.manage_cartitem")
             )
         )
+
+
+class IsCorrectCustomer(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            (
+                request.method in SAFE_METHODS
+                or request.user.id == request.data.get("customer")
+            )
+        )
