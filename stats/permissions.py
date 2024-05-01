@@ -12,10 +12,5 @@ class IsCustomerAndAuthenticated(BasePermission):
 
 
 class IsCorrectCustomer(BasePermission):
-    def has_permission(self, request, view):
-        return bool(
-            (
-                request.method in SAFE_METHODS
-                or request.user.id == request.data.get("customer")
-            )
-        )
+    def has_object_permission(self, request, view, obj):
+        return request.method in SAFE_METHODS or request.user.id == obj.customer.user.id

@@ -30,7 +30,7 @@ class SellerListView(ListAPIView):
 class CartItemListView(ListCreateAPIView):
     serializer_class = CartItemListCreateSerializer
     authentication_classes = [JWTAuthenticator]
-    permission_classes = [IsCustomerAndAuthenticated & IsCorrectCustomer]
+    permission_classes = [IsCustomerAndAuthenticated]
 
     def get_queryset(self):
         customer = self.request.user
@@ -48,7 +48,7 @@ class CartItemDetailView(RetrieveUpdateDestroyAPIView):
 
 class CartDeleteView(APIView):
     authentication_classes = [JWTAuthenticator]
-    permission_classes = [IsCustomerAndAuthenticated & IsCorrectCustomer]
+    permission_classes = [IsCustomerAndAuthenticated]
 
     def delete(self, request, *args, **kwargs):
         customer = self.request.user.customer
