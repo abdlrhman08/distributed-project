@@ -60,8 +60,8 @@ class CartItemListCreateSerializer(serializers.ModelSerializer):
             )
 
 
-# class CartItemUpdateDeleteSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = CartItem
-#         fields = ["id", "customer", "product", "quantity"]
-#         read_only_fields = ["id", "customer", "product"]
+class CartItemUpdateDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ["id", "customer", "product", "quantity"]
+        read_only_fields = ["id", "customer", "product"]

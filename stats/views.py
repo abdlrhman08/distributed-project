@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from authentication.authenticator import JWTAuthenticator
 from stats.serializers import (
     CartItemListCreateSerializer,
+    CartItemUpdateDeleteSerializer,
     SellerSerializer,
 )
 
@@ -39,7 +40,7 @@ class CartItemListView(ListCreateAPIView):
 
 # Make it update / delete only
 class CartItemDetailView(RetrieveUpdateDestroyAPIView):
-    serializer_class = CartItemListCreateSerializer
+    serializer_class = CartItemUpdateDeleteSerializer
     queryset = CartItem.objects.all()
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsCustomerAndAuthenticated & IsCorrectCustomer]
