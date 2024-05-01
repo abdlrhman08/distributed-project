@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 from rest_framework import serializers
 
 from authentication.serializers import UserSerializer
@@ -39,7 +40,7 @@ class CartItemListCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ["id", "customer", "product", "quantity"]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "customer"]
 
     def validate(self, data):
         if data["quantity"] <= 0:
@@ -48,6 +49,15 @@ class CartItemListCreateSerializer(serializers.ModelSerializer):
             )
 
         return data
+
+    def create(self, validated_data):
+        try:
+            validated_data["customer"] = self.context["request"].user.customer
+            return super().create(validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError(
+                {"details": "The customer already has this product in his cart"}
+            )
 
 
 # class CartItemUpdateDeleteSerializer(serializers.ModelSerializer):
