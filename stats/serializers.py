@@ -36,19 +36,21 @@ class SellerSerializer(serializers.ModelSerializer):
         return user.data
 
 
+def validate_quantity(obj):
+    if obj["quantity"] <= 0:
+        raise serializers.ValidationError(
+            {"details": "Product quantity must be greater than 0"}
+        )
+    return obj
+
+
 class CartItemListCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ["id", "customer", "product", "quantity"]
         read_only_fields = ["id", "customer"]
+        validators = [validate_quantity]
 
-    def validate(self, data):
-        if data["quantity"] <= 0:
-            raise serializers.ValidationError(
-                {"details": "Product quantity must be greater than 0"}
-            )
-
-        return data
 
     def create(self, validated_data):
         try:
@@ -65,3 +67,4 @@ class CartItemUpdateDeleteSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ["id", "customer", "product", "quantity"]
         read_only_fields = ["id", "customer", "product"]
+        validators = [validate_quantity]
