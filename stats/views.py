@@ -16,7 +16,7 @@ class AddProductToWishlistView(generics.CreateAPIView):
     serializer_class = CustomerSerializer
 
     def post(self, request, *args, **kwargs):
-        user = self.request.user.get('user')
+        user = self.request.user
         product = self.request.data.get('product')
 
         # Retrieve the customer based on the request user
@@ -30,7 +30,7 @@ class RemoveProductWishlistView(generics.DestroyAPIView):
     serializer_class = CustomerSerializer
 
     def delete(self, request, *args, **kwargs):
-        user = self.request.user.get('user')
+        user = self.request.user
         product = self.request.data.get('product')
 
         # Retrieve the customer based on the request user
@@ -42,7 +42,7 @@ class RemoveAllProducts_Wl_View(generics.DestroyAPIView):
     serializer_class = CustomerSerializer
 
     def delete(self, request, *args, **kwargs):
-        user = self.request.user.get('user')
+        user = self.request.user
 
         # Retrieve the customer based on the request user
         customer = Customer.objects.get(user=user)
@@ -54,7 +54,7 @@ class GetWishlistView(generics.ListAPIView):
     serializer_class = CustomerSerializer
 
     def get_queryset(self):
-        user = self.request.get('user')
+        user = self.request
         if user:
             customer = Customer.objects.filter(user=user)
             return customer.wishlist
