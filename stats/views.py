@@ -12,7 +12,7 @@ class SellerListView(generics.ListAPIView):
         queryset = Seller.objects.all()[:number]
         return queryset
 
-class AddProductToWishlistView(generics.DestroyAPIView):
+class AddProductToWishlistView(generics.CreateAPIView):
     serializer_class = CustomerSerializer
 
     def post(self, request, *args, **kwargs):
