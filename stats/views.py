@@ -1,9 +1,7 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
-
-from .models import Seller,Customer
-from .serializers import SellerSerializer,CustomerSerializer
-from django.views.generic import View
+from .models import Seller, Customer
+from .serializers import SellerSerializer, CustomerSerializer
 from rest_framework.response import Response
 from authentication.authenticator import JWTAuthenticator
 from rest_framework.permissions import IsAuthenticated
@@ -19,6 +17,7 @@ class AddProductToWishlistView(APIView):
     serializer_class = CustomerSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
         user = self.request.user
         product = self.request.data.get('product')
@@ -29,12 +28,13 @@ class AddProductToWishlistView(APIView):
         # Add the product to the wishlist
         customer.wishlist.add(product)
 
-        return Response({"details": "Product added to wishlist"},status= status.HTTP_201_CREATED)
+        return Response({"details": "Product added to wishlist"}, status=status.HTTP_201_CREATED)
 
 class RemoveProductWishlistView(generics.DestroyAPIView):
     serializer_class = CustomerSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
+
     def delete(self, request, *args, **kwargs):
         user = self.request.user
         product = self.request.data.get('product')
@@ -50,6 +50,7 @@ class ClearWishlistView(generics.DestroyAPIView):
     serializer_class = CustomerSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
+
     def delete(self, request, *args, **kwargs):
         user = self.request.user
 
@@ -71,4 +72,3 @@ class GetWishlistView(generics.ListAPIView):
             customer = Customer.objects.filter(user=user)
             return customer.wishlist
         return Customer.objects.none()
-
