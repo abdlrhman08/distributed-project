@@ -1,7 +1,8 @@
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.views import APIView
+
 from .models import Seller,Customer
 from .serializers import SellerSerializer,CustomerSerializer
-from django.http import JsonResponse
 from django.views.generic import View
 from rest_framework.response import Response
 from authentication.authenticator import JWTAuthenticator
@@ -14,7 +15,7 @@ class SellerListView(generics.ListAPIView):
         queryset = Seller.objects.all()[:number]
         return queryset
 
-class AddProductToWishlistView(View):
+class AddProductToWishlistView(APIView):
     serializer_class = CustomerSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
@@ -28,7 +29,7 @@ class AddProductToWishlistView(View):
         # Add the product to the wishlist
         customer.wishlist.add(product)
 
-        return Response({"details": "Product added to wishlist"})
+        return Response({"details": "Product added to wishlist"},status= status.HTTP_201_CREATED)
 
 class RemoveProductWishlistView(generics.DestroyAPIView):
     serializer_class = CustomerSerializer
