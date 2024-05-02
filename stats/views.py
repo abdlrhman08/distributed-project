@@ -1,8 +1,9 @@
 from rest_framework import generics
 from .models import Seller,Customer
-from .serializers import SellerSerializer
+from .serializers import SellerSerializer,CustomerSerializer
 from django.http import JsonResponse
 from django.views.generic import View
+from rest_framework.response import Response
 class SellerListView(generics.ListAPIView):
     serializer_class = SellerSerializer
 
@@ -11,55 +12,51 @@ class SellerListView(generics.ListAPIView):
         queryset = Seller.objects.all()[:number]
         return queryset
 
-class AddProductToWishlistView(View):
-
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+class AddProductToWishlistView(generics.DestroyAPIView):
+    serializer_class = CustomerSerializer
 
     def post(self, request, *args, **kwargs):
-        data = request.POST
-        customer_name = data.get('customer_name')
-        product_name = data.get('product_name')
-        if not customer_name or not product_name:
-            return JsonResponse({"error": "Customer name and product name are required"}, status=400)
-        response = Customer.wishlist.add_product(customer_name, product_name)
-        return JsonResponse(response)
+        user = self.request.user.get('user')
+        product = self.request.data.get('product')
 
-class RemoveProductFromWishlistView(View):
+        # Retrieve the customer based on the request user
+        customer = Customer.objects.get(user=user)
 
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+        # Add the product to the wishlist
+        customer.wishlist.add(product)
 
-    def post(self, request, *args, **kwargs):
-        data = request.POST
-        customer_name = data.get('customer_name')
-        product_name = data.get('product_name')
-        if not customer_name or not product_name:
-            return JsonResponse({"error": "Customer name and product name are required"}, status=400)
-        response = Customer.wishlist.remove_product(customer_name, product_name)
-        return JsonResponse(response)
 
-class RemoveAllProductsFromWishlistView(View):
+class RemoveProductWishlistView(generics.DestroyAPIView):
+    serializer_class = CustomerSerializer
 
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+    def delete(self, request, *args, **kwargs):
+        user = self.request.user.get('user')
+        product = self.request.data.get('product')
 
-    def post(self, request, *args, **kwargs):
-        data = request.POST
-        customer_name = data.get('customer_name')
-        if not customer_name:
-            return JsonResponse({"error": "Customer name is required"}, status=400)
-        response = Customer.wishlist.remove_all_products(customer_name)
-        return JsonResponse(response)
+        # Retrieve the customer based on the request user
+        customer = Customer.objects.get(user=user)
 
-class GetWishlistView(View):
+        # Remove the product from the wishlist
+        customer.wishlist.remove(product)
+class RemoveAllProducts_Wl_View(generics.DestroyAPIView):
+    serializer_class = CustomerSerializer
 
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+    def delete(self, request, *args, **kwargs):
+        user = self.request.user.get('user')
 
-    def get(self, request, *args, **kwargs):
-        customer_name = request.GET.get('customer_name')
-        if not customer_name:
-            return JsonResponse({"error": "Customer name is required"}, status=400)
-        wishlist = Customer.wishlist.get_wishlist(customer_name)
-        return JsonResponse({"wishlist": list(wishlist)})
+        # Retrieve the customer based on the request user
+        customer = Customer.objects.get(user=user)
+
+        # Remove the product from the wishlist
+        customer.wishlist.clear()
+
+class GetWishlistView(generics.ListAPIView):
+    serializer_class = CustomerSerializer
+
+    def get_queryset(self):
+        user = self.request.get('user')
+        if user:
+            customer = Customer.objects.filter(user=user)
+            return customer.wishlist
+        return Customer.objects.none()
+
