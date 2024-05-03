@@ -28,12 +28,11 @@ class CustomerRegistrationSerializer(serializers.ModelSerializer):
 
 
 class SellerSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Seller
         fields = ["user", "company_name", "location"]
-        read_only_fields = ["user"]
 
     def validate(self, data):
         self.user = self.context["request"].user
@@ -50,10 +49,6 @@ class SellerSerializer(serializers.ModelSerializer):
             company_name=validated_data["company_name"],
             location=validated_data["location"],
         )
-
-    def get_user(self, obj):
-        user = UserSerializer(obj.user)
-        return user.data
 
 
 def validate_quantity(obj):
