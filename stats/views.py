@@ -1,10 +1,15 @@
 from rest_framework import generics, status
-from rest_framework.views import APIView
-from .models import Seller, Customer
-from .serializers import SellerSerializer, CustomerSerializer
-from rest_framework.response import Response
-from authentication.authenticator import JWTAuthenticator
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from authentication.authenticator import JWTAuthenticator
+from store.serializers import ProductSerlializer
+
+from .models import Customer, Seller
+from .serializers import SellerSerializer, WishlistProductSerializer
+
+
 class SellerListView(generics.ListAPIView):
     serializer_class = SellerSerializer
 
@@ -13,62 +18,51 @@ class SellerListView(generics.ListAPIView):
         queryset = Seller.objects.all()[:number]
         return queryset
 
+
 class AddProductToWishlistView(APIView):
-    serializer_class = CustomerSerializer
+    serializer_class = WishlistProductSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        user = self.request.user
-        product = self.request.data.get('product')
+        serializer = self.serializer_class(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_200_OK)
 
-        # Retrieve the customer based on the request user
-        customer = Customer.objects.get(user=user)
-
-        # Add the product to the wishlist
-        customer.wishlist.add(product)
-
-        return Response({"details": "Product added to wishlist"}, status=status.HTTP_201_CREATED)
 
 class RemoveProductWishlistView(generics.DestroyAPIView):
-    serializer_class = CustomerSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, *args, **kwargs):
-        user = self.request.user
-        product = self.request.data.get('product')
+    def get_queryset(self):
+        self.customer = self.request.user.customer
+        self.wishlist = self.customer.wishlist
+        return self.wishlist
 
-        # Retrieve the customer based on the request user
-        customer = Customer.objects.get(user=user)
+    def perform_destroy(self, instance):
+        self.wishlist.remove(instance)
 
-        # Remove the product from the wishlist
-        customer.wishlist.remove(product)
-
-        return Response({"details": "Product removed from wishlist"})
+  
 class ClearWishlistView(generics.DestroyAPIView):
-    serializer_class = CustomerSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, *args, **kwargs):
-        user = self.request.user
+    def get_object(self):
+        customer = self.request.user.customer
+        return customer.wishlist
 
-        # Retrieve the customer based on the request user
-        customer = Customer.objects.get(user=user)
+    def perform_destroy(self, instance):
+        # instance here is the wishlist
+        instance.clear()
 
-        # Remove the product from the wishlist
-        customer.wishlist.clear()
 
-        return Response({"details": "Wishlist cleared"})
 class GetWishlistView(generics.ListAPIView):
-    serializer_class = CustomerSerializer
+    serializer_class = ProductSerlializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        if user:
-            customer = Customer.objects.filter(user=user)
-            return customer.wishlist
-        return Customer.objects.none()
+        customer = Customer.objects.get(user=user)
+        return customer.wishlist
