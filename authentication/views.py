@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +9,8 @@ from stats.serializers import SellerSerializer
 
 from .authenticator import JWTAuthenticator, JWToken
 from .serializers import CredientalsSerializer, UserSerializer
+
+User = get_user_model()
 
 
 class AuthenticateUserView(APIView):
@@ -20,7 +23,10 @@ class AuthenticateUserView(APIView):
             password = user_credientals.validated_data["password"]
             access_token = JWToken.get_for_user(email, password)
 
-            return Response({"token": str(access_token)})
+            user = User.objects.get(email=email)
+            user_serializer = UserSerializer(user)
+
+            return Response({"token": str(access_token), "user": user_serializer.data})
 
         return Response({"details": "Invalid form"}, status=HTTP_406_NOT_ACCEPTABLE)
 
