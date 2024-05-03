@@ -9,12 +9,11 @@ from store.serializers import ProductSerlializer
 
 from .models import CartItem, Customer, Seller
 from .serializers import (
-    SellerSerializer,
     CartItemListCreateSerializer,
     CartItemUpdateDeleteSerializer,
-    WishlistProductSerializer
+    SellerSerializer,
+    WishlistProductSerializer,
 )
-from .permissions import IsCustomerAndAuthenticated
 
 
 class SellerListView(generics.ListAPIView):
@@ -32,7 +31,9 @@ class AddProductToWishlistView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context={"request": request})
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_200_OK)
@@ -50,7 +51,7 @@ class RemoveProductWishlistView(generics.DestroyAPIView):
     def perform_destroy(self, instance):
         self.wishlist.remove(instance)
 
-  
+
 class ClearWishlistView(generics.DestroyAPIView):
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
@@ -73,8 +74,8 @@ class GetWishlistView(generics.ListAPIView):
         user = self.request.user
         customer = Customer.objects.get(user=user)
         return customer.wishlist
-    
-    
+
+
 class CartItemListDeleteView(generics.ListCreateAPIView):
     serializer_class = CartItemListCreateSerializer
     authentication_classes = [JWTAuthenticator]

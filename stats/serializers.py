@@ -75,7 +75,9 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 
 class WishlistProductSerializer(serializers.Serializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), write_only=True)
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all(), write_only=True
+    )
 
     def create(self, validated_data):
         product = validated_data["product"]
