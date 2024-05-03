@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_201_CREATED, HTTP_406_NOT_ACCEPTABLE
 from rest_framework.views import APIView, Response
 
-from stats.serializers import SellerSerializer
+from stats.serializers import CustomerRegistrationSerializer, SellerSerializer
 
 from .authenticator import JWTAuthenticator, JWToken
 from .serializers import CredientalsSerializer, UserSerializer
@@ -31,13 +31,13 @@ class AuthenticateUserView(APIView):
         return Response({"details": "Invalid form"}, status=HTTP_406_NOT_ACCEPTABLE)
 
 
-class RegisterUserView(APIView):
-    serializer_class = UserSerializer
+class RegisterCustomerView(APIView):
+    serializer_class = CustomerRegistrationSerializer
 
     def post(self, request):
-        user_serializer = self.serializer_class(data=request.data)
-        if user_serializer.is_valid(raise_exception=True):
-            user_serializer.save()
+        customer_serializer = self.serializer_class(data=request.data)
+        if customer_serializer.is_valid(raise_exception=True):
+            customer_serializer.save()
             return Response(status=HTTP_201_CREATED)
 
         return Response({"details": "Invalid form"}, status=HTTP_406_NOT_ACCEPTABLE)

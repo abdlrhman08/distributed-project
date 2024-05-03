@@ -1,10 +1,30 @@
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from rest_framework import serializers
 
 from authentication.serializers import UserSerializer
 
-from .models import CartItem, Seller
+from .models import CartItem, Customer, Seller
+
+User = get_user_model()
+
+
+class CustomerRegistrationSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Customer
+        fields = ["user", "avatar", "address", "wishlist"]
+        read_only_fields = ["wishlist"]
+
+    def create(self, validated_data):
+        user_data = validated_data.pop("user")
+        user_serializer = UserSerializer(data=user_data)
+        if user_serializer.is_valid(raise_exception=True):
+            user = user_serializer.save()
+        customer = Customer.objects.create(user=user, **validated_data)
+        return customer
 
 
 class SellerSerializer(serializers.ModelSerializer):
