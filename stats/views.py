@@ -2,10 +2,10 @@ from rest_framework import status
 from rest_framework.generics import (
     ListAPIView,
     ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView,
+    UpdateAPIView,
 )
+from rest_framework.mixins import DestroyModelMixin
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from authentication.authenticator import JWTAuthenticator
 from stats.serializers import (
@@ -27,7 +27,7 @@ class SellerListView(ListAPIView):
         return queryset
 
 
-class CartItemListView(ListCreateAPIView):
+class CartItemListDeleteView(ListCreateAPIView):
     serializer_class = CartItemListCreateSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsCustomerAndAuthenticated]
@@ -37,23 +37,22 @@ class CartItemListView(ListCreateAPIView):
         items = CartItem.objects.filter(customer__user=customer)
         return items
 
+    def delete(self, request, *args, **kwargs):
+        customer = self.request.user.customer
+        cart_items = CartItem.objects.filter(customer=customer)
+        cart_items.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-# Make it update / delete only
-class CartItemDetailView(RetrieveUpdateDestroyAPIView):
+
+class CartItemDeleteUpdateView(DestroyModelMixin, UpdateAPIView):
     serializer_class = CartItemUpdateDeleteSerializer
-    queryset = CartItem.objects.all()
-    authentication_classes = [JWTAuthenticator]
-    permission_classes = [IsCustomerAndAuthenticated & IsCorrectCustomer]
-
-
-class CartDeleteView(APIView):
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsCustomerAndAuthenticated]
 
+    def get_queryset(self):
+        customer = self.request.user
+        items = CartItem.objects.filter(customer__user=customer)
+        return items
+
     def delete(self, request, *args, **kwargs):
-        customer = self.request.user.customer
-        if customer:
-            cart_items = CartItem.objects.filter(customer=customer)
-            cart_items.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return self.destroy(request, *args, **kwargs)
