@@ -51,7 +51,6 @@ class CartItemListCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "customer"]
         validators = [validate_quantity]
 
-
     def create(self, validated_data):
         try:
             validated_data["customer"] = self.context["request"].user.customer
