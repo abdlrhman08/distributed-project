@@ -1,4 +1,5 @@
 from rest_framework import generics, status
+from rest_framework.mixins import DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,8 +7,14 @@ from rest_framework.views import APIView
 from authentication.authenticator import JWTAuthenticator
 from store.serializers import ProductSerlializer
 
-from .models import Customer, Seller
-from .serializers import SellerSerializer, WishlistProductSerializer
+from .models import CartItem, Customer, Seller
+from .serializers import (
+    SellerSerializer,
+    CartItemListCreateSerializer,
+    CartItemUpdateDeleteSerializer,
+    WishlistProductSerializer
+)
+from .permissions import IsCustomerAndAuthenticated
 
 
 class SellerListView(generics.ListAPIView):
@@ -66,3 +73,34 @@ class GetWishlistView(generics.ListAPIView):
         user = self.request.user
         customer = Customer.objects.get(user=user)
         return customer.wishlist
+    
+    
+class CartItemListDeleteView(generics.ListCreateAPIView):
+    serializer_class = CartItemListCreateSerializer
+    authentication_classes = [JWTAuthenticator]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        customer = self.request.user
+        items = CartItem.objects.filter(customer__user=customer)
+        return items
+
+    def delete(self, request, *args, **kwargs):
+        customer = self.request.user.customer
+        cart_items = CartItem.objects.filter(customer=customer)
+        cart_items.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CartItemDeleteUpdateView(DestroyModelMixin, generics.UpdateAPIView):
+    serializer_class = CartItemUpdateDeleteSerializer
+    authentication_classes = [JWTAuthenticator]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        customer = self.request.user
+        items = CartItem.objects.filter(customer__user=customer)
+        return items
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
