@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_201_CREATED, HTTP_406_NOT_ACCEPTABLE
+from rest_framework.status import HTTP_406_NOT_ACCEPTABLE
 from rest_framework.views import APIView, Response
 
 from stats.models import Customer
