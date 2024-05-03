@@ -86,8 +86,10 @@ class PrivateSellerSerializer(SellerSerializer):
         ]
 
     def get_average_rating(self, obj):
-        return Stats.objects.filter(product__seller=obj).aggregate(Avg("rating", default=0))["rating__avg"]
-            
+        return Stats.objects.filter(product__seller=obj).aggregate(
+            Avg("rating", default=0)
+        )["rating__avg"]
+
 
 class WishlistProductSerializer(serializers.Serializer):
     product = serializers.PrimaryKeyRelatedField(
