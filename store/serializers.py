@@ -8,7 +8,7 @@ from .models import Category, Product
 
 
 # TODO: Improve this field
-class PathField(serializers.Field):
+class PathField(serializers.PrimaryKeyRelatedField):
     def __init__(self, *args, **kwargs):
         self.view_name = kwargs.pop("view_name")
         self.query_param_name = kwargs.pop("query_param_name", None)
@@ -56,7 +56,10 @@ class CategorySerializer(serializers.ModelSerializer):
     example_products = serializers.SerializerMethodField("get_example_products")
     products_number = serializers.IntegerField(source="products_num")
     category_path = PathField(
-        source="id", view_name="store:products_view", query_param_name="cat"
+        source="id",
+        view_name="store:products_view",
+        query_param_name="cat",
+        read_only=True,
     )
 
     class Meta:

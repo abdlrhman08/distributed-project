@@ -108,7 +108,7 @@ class WishlistProductSerializer(serializers.Serializer):
 
 
 class CartItemListSerializer(serializers.ModelSerializer):
-    product = PathField(view_name="store:products_retrieve")
+    product = PathField(view_name="store:products_retrieve", read_only=True)
 
     class Meta:
         model = CartItem
@@ -117,6 +117,10 @@ class CartItemListSerializer(serializers.ModelSerializer):
 
 
 class CartItemCreateDeleteSerializer(serializers.ModelSerializer):
+    product = PathField(
+        view_name="store:products_retrieve", queryset=Product.objects.all()
+    )
+
     class Meta:
         model = CartItem
         fields = ["id", "customer", "product", "quantity"]
@@ -134,6 +138,8 @@ class CartItemCreateDeleteSerializer(serializers.ModelSerializer):
 
 
 class CartItemUpdateDeleteSerializer(serializers.ModelSerializer):
+    product = PathField(view_name="store:products_retrieve", read_only=True)
+
     class Meta:
         model = CartItem
         fields = ["id", "customer", "product", "quantity"]
