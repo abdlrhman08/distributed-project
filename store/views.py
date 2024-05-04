@@ -14,7 +14,7 @@ class CategoriesListView(generics.ListAPIView):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context["n_products"] = int(self.request.query_params.get("products", 0))
+        context["n_products"] = int(self.request.query_params.get("products", 10))
         return context
 
 
