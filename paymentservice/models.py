@@ -5,8 +5,8 @@ from django.db import models
 class Order(models.Model):
     state_types = {"p": "pending", "o": "out for delivery", "d": "delivered"}
 
-    payment_details = models.ForeignKey(
-        to="PaymentDetails", on_delete=models.DO_NOTHING
+    payment_set = models.ForeignKey(
+        to="PaymentDetails", on_delete=models.DO_NOTHING, null=True
     )
     amount = models.IntegerField()
     state = models.CharField(choices=state_types, max_length=1)
