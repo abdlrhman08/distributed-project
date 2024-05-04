@@ -12,6 +12,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
+    "drf_spectacular",
     "rest_framework",
     "store",
     "stats",
@@ -21,6 +23,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -31,6 +34,18 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "distributed_project.urls"
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "E-Commerce site backend",
+    "DESCRIPTION": "API Documention for our E-commerce site",
+    "AUTHENTICATION_WHITELIST": ["authentication.authenticator.JWTAuthenticator"],
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
 
 TEMPLATES = [
     {
