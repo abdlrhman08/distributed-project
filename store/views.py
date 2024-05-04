@@ -9,7 +9,7 @@ from .serializers import CategorySerializer, ProductSerializer
 
 
 class CategoriesListView(generics.ListAPIView):
-    queryset = Category.objects.all()
+    queryset = Category.objects.prefetch_related("product_set").all()
     serializer_class = CategorySerializer
 
     def get_serializer_context(self):
