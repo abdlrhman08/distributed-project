@@ -1,5 +1,9 @@
+
+from datetime import datetime
+
 from rest_framework import serializers
 
+from paymentservice.models import PaymentDetails
 from stats.models import CartItem
 from store.serializers import ProductSerializer
 
@@ -43,3 +47,36 @@ class OrderSerializer(serializers.ModelSerializer):
         order.save()
 
         return order
+
+
+class PaymentDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentDetails
+        fields = "__all__"
+        read_only_fields = ["id"]
+
+    def validate(self, attrs):
+        if attrs["payment_method"] not in ["credit card", "cash"]:
+            raise serializers.ValidationError("Invalid payment method")
+
+        if attrs["payment_method"] == "credit card":
+            if len(attrs["credit_card_number"]) != 16:
+                raise serializers.ValidationError("Invalid credit card number")
+
+            if len(attrs["payment_amount"]) < 0:
+                raise serializers.ValidationError("Invalid payment amount")
+
+            if attrs["payment_date"] > datetime.now():
+                raise serializers.ValidationError("Invalid payment date")
+
+            if attrs["credit_card_expiry"] < datetime.now():
+                raise serializers.ValidationError("Invalid credit card expiry date")
+
+        if attrs["payment_method"] == "cash":
+            if len(attrs["payment_amount"]) < 0:
+                raise serializers.ValidationError("Invalid payment amount")
+
+            if attrs["payment_date"] > datetime.now():
+                raise serializers.ValidationError("Invalid payment date")
+
+        return True
