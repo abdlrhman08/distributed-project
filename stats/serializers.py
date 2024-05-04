@@ -107,16 +107,7 @@ class WishlistProductSerializer(serializers.Serializer):
         return product
 
 
-class CartItemListSerializer(serializers.ModelSerializer):
-    product = PathField(view_name="store:products_retrieve", read_only=True)
-
-    class Meta:
-        model = CartItem
-        fields = ["id", "customer", "product", "quantity"]
-        read_only_fields = ["id", "customer"]
-
-
-class CartItemCreateDeleteSerializer(serializers.ModelSerializer):
+class CartItemListCreateSerializer(serializers.ModelSerializer):
     product = PathField(
         view_name="store:products_retrieve", queryset=Product.objects.all()
     )

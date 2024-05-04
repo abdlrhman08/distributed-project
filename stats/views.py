@@ -11,8 +11,7 @@ from store.serializers import PrivateProductSerializer, ProductSerializer
 
 from .models import CartItem, Customer, Seller
 from .serializers import (
-    CartItemCreateDeleteSerializer,
-    CartItemListSerializer,
+    CartItemListCreateSerializer,
     CartItemUpdateDeleteSerializer,
     PrivateSellerSerializer,
     SellerSerializer,
@@ -102,26 +101,17 @@ class GetWishlistView(generics.ListAPIView):
         return customer.wishlist
 
 
-class CartItemListDeleteView(generics.ListCreateAPIView):
+class CartItemListCreateDeleteView(generics.ListCreateAPIView):
+    serializer_class = CartItemListCreateSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
 
-    def get_serializer_class(self):
-        if self.request.method == "GET":
-            return CartItemListSerializer
-        return CartItemCreateDeleteSerializer
-
     def get_queryset(self):
         customer = self.request.user
-        items = CartItem.objects.filter(customer__user=customer)
+        items = CartItem.objects.filter(customer__user=customer).prefetch_related(
+            "product"
+        )
         return items
-
-    def get_serializer_context(self):
-        if self.request.method == "GET":
-            result = super().get_serializer_context()
-            result["request"] = None
-            return result
-        return super().get_serializer_context()
 
     def delete(self, request, *args, **kwargs):
         customer = self.request.user.customer
