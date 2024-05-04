@@ -6,7 +6,7 @@ class Order(models.Model):
     state_types = {"p": "pending", "o": "out for delivery", "d": "delivered"}
 
     payment_details = models.ForeignKey(
-        to="paymentservice.models.PaymentDetails", on_delete=models.DO_NOTHING
+        to="PaymentDetails", on_delete=models.DO_NOTHING
     )
     amount = models.IntegerField()
     state = models.CharField(choices=state_types, max_length=1)
