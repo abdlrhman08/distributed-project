@@ -16,6 +16,7 @@ class Order(models.Model):
     def __str__(self):
         return self.customer.user.username + "'s order ID " + self.id
 
+
 class PaymentDetails(models.Model):
     payment_method = models.CharField(max_length=50)
     credit_card_number = models.CharField(max_length=16)
@@ -24,8 +25,9 @@ class PaymentDetails(models.Model):
     payment_amount = models.IntegerField()
 
     def __str__(self):
-        return "payment method :" + self.payment_method + " payment of :" + str(self.payment_amount) + " made on :" +\
-                                 str(self.payment_date) + " with card number " + self.credit_card_number
+        return "payment method :" + self.payment_method + " payment of :" + str(self.payment_amount) + " made on :" + \
+            str(self.payment_date) + " with card number " + self.credit_card_number
+
 
 class OrderItems(models.Model):
     order = models.ForeignKey(to=Order, on_delete=models.DO_NOTHING)
@@ -34,10 +36,10 @@ class OrderItems(models.Model):
 
     def __str__(self):
         return (
-            "order ID: "
-            + self.order.id
-            + ", item: "
-            + self.product.name
-            + ", qty: "
-            + self.quantity
+                "order ID: "
+                + self.order.id
+                + ", item: "
+                + self.product.name
+                + ", qty: "
+                + self.quantity
         )
