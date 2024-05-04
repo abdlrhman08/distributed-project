@@ -21,6 +21,8 @@ class PathField(serializers.PrimaryKeyRelatedField):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    product_path = PathField(view_name="store:products_retrieve", source="id", read_only=True)
+
     class Meta:
         model = Product
         fields = [
@@ -32,6 +34,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "specs",
             "category",
             "seller",
+            "product_path",
         ]
         read_only_fields = ["id", "seller"]
 
