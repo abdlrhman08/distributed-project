@@ -7,18 +7,11 @@ from rest_framework import serializers
 from .models import Category, Product
 
 
-# TODO: Improve this field
 class PathField(serializers.PrimaryKeyRelatedField):
     def __init__(self, *args, **kwargs):
         self.view_name = kwargs.pop("view_name")
         self.query_param_name = kwargs.pop("query_param_name", None)
         super().__init__(*args, **kwargs)
-
-    def get_attribute(self, instance):
-        instance = super().get_attribute(instance)
-        if isinstance(instance, models.Model):
-            return instance.pk
-        return instance
 
     def to_representation(self, value):
         if self.query_param_name:
