@@ -1,10 +1,12 @@
 import os
-from django.core.management.base import BaseCommand
-import pandas as pd
-import re
 import random
+import re
+
+import pandas as pd
+from django.core.management.base import BaseCommand
 
 from store.models import Category, Product
+
 
 class Command(BaseCommand):
     help = "Upload initial data to database"
@@ -23,12 +25,7 @@ class Command(BaseCommand):
             self.stderr.write(f"File '{filepath}' does not exist.")
             return
 
-        # Read Excel
-        try:
-            df = pd.read_excel(filepath)
-        except Exception as e:
-            self.stderr.write(f"Error reading Excel file: {e}")
-            return
+        df = pd.read_excel(filepath)
 
         category_name = os.path.basename(filepath).split("Data")[0]
         # _ for the returned tuple
@@ -43,13 +40,47 @@ class Command(BaseCommand):
                     category=category,
                     # seller=self.generate_random_seller(),
                     quantity=self.generate_random_quantity(),
-                    description="Producer : " + row["Producer"] + "\n" + "Vram: " + row["Vram"] + "\n" + "Boost Clock: "
-                                + row["Boost Clock"] + "\n" + "TDP: " + row["TDP"] + "\n" + "Memory Clock :" +
-                                row["Memory Clock"] + "\n" + "DisplayPort: " + row["DisplayPort"] + "\n" + "HDMI: " +
-                                row["HDMI"] + "\n" + "Slots" + row["Slots"] + "\n" + "Length: " + row["Length"] + "\n" +
-                                "Width: " + row["Width"] + "\n" + "Height: " + row["Height"] + "\n" + "Weight: "
-                                + row["Weight"] + "\n" + "Warranty: " + row["Warranty"] + "\n"
-                                + "Price: " + row["Price"]
+                    description="Producer : "
+                    + row["Producer"]
+                    + "\n"
+                    + "Vram: "
+                    + row["Vram"]
+                    + "\n"
+                    + "Boost Clock: "
+                    + row["Boost Clock"]
+                    + "\n"
+                    + "TDP: "
+                    + row["TDP"]
+                    + "\n"
+                    + "Memory Clock :"
+                    + row["Memory Clock"]
+                    + "\n"
+                    + "DisplayPort: "
+                    + row["DisplayPort"]
+                    + "\n"
+                    + "HDMI: "
+                    + row["HDMI"]
+                    + "\n"
+                    + "Slots"
+                    + row["Slots"]
+                    + "\n"
+                    + "Length: "
+                    + row["Length"]
+                    + "\n"
+                    + "Width: "
+                    + row["Width"]
+                    + "\n"
+                    + "Height: "
+                    + row["Height"]
+                    + "\n"
+                    + "Weight: "
+                    + row["Weight"]
+                    + "\n"
+                    + "Warranty: "
+                    + row["Warranty"]
+                    + "\n"
+                    + "Price: "
+                    + row["Price"],
                 )
 
     # def generate_random_seller(self):
