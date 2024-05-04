@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.db.models import Avg
+from django.urls import reverse
 from rest_framework import serializers
 
 from authentication.serializers import UserSerializer
@@ -103,12 +104,30 @@ class WishlistProductSerializer(serializers.Serializer):
         return product
 
 
-class CartItemListCreateSerializer(serializers.ModelSerializer):
+class CartItemListSerializer(serializers.ModelSerializer):
+    product = serializers.HyperlinkedRelatedField(
+        many=False, view_name="store:products_retrieve", read_only=True
+    )
+
+    class Meta:
+        model = CartItem
+        fields = ["id", "customer", "product", "quantity"]
+        read_only_fields = ["id", "customer"]
+
+
+class CartItemCreateDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ["id", "customer", "product", "quantity"]
         read_only_fields = ["id", "customer"]
         validators = [validate_quantity]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["product"] = reverse("store:products_view") + str(
+            instance.product.id
+        )
+        return representation
 
     def create(self, validated_data):
         try:
@@ -126,3 +145,10 @@ class CartItemUpdateDeleteSerializer(serializers.ModelSerializer):
         fields = ["id", "customer", "product", "quantity"]
         read_only_fields = ["id", "customer", "product"]
         validators = [validate_quantity]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["product"] = reverse("store:products_view") + str(
+            instance.product.id
+        )
+        return representation
