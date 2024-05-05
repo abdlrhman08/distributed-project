@@ -23,7 +23,7 @@ class ViewPerformOrdersView(generics.ListCreateAPIView):
 
 
 class OrderDetailView(generics.RetrieveAPIView):
-    serializer_class = OrderSerializer2
+    serializer_class = OrderSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
 
