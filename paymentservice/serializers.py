@@ -17,7 +17,7 @@ class PaymentDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
     def validate(self, attrs):
-        payment_date = datetime.fromisoformat("2024-05-04T20:10:34.147Z").replace(
+        payment_date = datetime.fromisoformat(datetime.now().__str__()).replace(
             tzinfo=pytz.utc
         )
         if attrs["payment_method"] not in ["credit card", "cash"]:
