@@ -63,6 +63,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         user = self.request.user
         return get_object_or_404(self.queryset, user=user)
 
+
 class AddProductToWishlistView(APIView):
     serializer_class = WishlistProductSerializer
     authentication_classes = [JWTAuthenticator]
