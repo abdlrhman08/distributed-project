@@ -14,6 +14,7 @@ class PaymentDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentDetails
         fields = "__all__"
+
         read_only_fields = ["id"]
 
     def validate(self, attrs):
@@ -27,9 +28,6 @@ class PaymentDetailsSerializer(serializers.ModelSerializer):
             if len(attrs["credit_card_number"]) != 16:
                 raise serializers.ValidationError("Invalid credit card number")
 
-            if attrs["payment_amount"] < 0:
-                raise serializers.ValidationError("Invalid payment amount")
-
             if attrs["payment_date"] > payment_date:
                 raise serializers.ValidationError("Invalid payment date")
 
@@ -39,6 +37,7 @@ class PaymentDetailsSerializer(serializers.ModelSerializer):
         if attrs["payment_method"] == "cash":
             if len(attrs["payment_amount"]) < 0:
                 raise serializers.ValidationError("Invalid payment amount")
+
             if attrs["payment_date"] > payment_date:
                 raise serializers.ValidationError("Invalid payment date")
 
@@ -85,8 +84,10 @@ class OrderSerializer(serializers.ModelSerializer):
             # sellers to a set and the different products and saving them invidually
             product_seller.save()
             referred_product.save()
-        order.payment_set = PaymentDetails.objects.create(**payment_details)
+            
         order.amount = amount
+        payment_details["payment_amount"] = amount
+        order.payment_set = PaymentDetails.objects.create(**payment_details)
         order.save()
 
         return order

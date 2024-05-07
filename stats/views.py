@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -13,6 +14,7 @@ from .models import CartItem, Customer, Seller
 from .serializers import (
     CartItemListCreateSerializer,
     CartItemUpdateDeleteSerializer,
+    CustomerReadUpdateDeleteSerializer,
     PrivateSellerSerializer,
     SellerSerializer,
     WishlistProductSerializer,
@@ -48,6 +50,18 @@ class LowOnStockProductsView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Product.objects.filter(seller__user=user, quantity__lte=5)
+
+
+class ProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = CustomerReadUpdateDeleteSerializer
+    queryset = Customer.objects.all().prefetch_related("order_set")
+
+    authentication_classes = [JWTAuthenticator]
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        user = self.request.user
+        return get_object_or_404(self.queryset, user=user)
 
 
 class AddProductToWishlistView(APIView):
@@ -101,14 +115,16 @@ class GetWishlistView(generics.ListAPIView):
         return customer.wishlist
 
 
-class CartItemListDeleteView(generics.ListCreateAPIView):
+class CartItemListCreateDeleteView(generics.ListCreateAPIView):
     serializer_class = CartItemListCreateSerializer
     authentication_classes = [JWTAuthenticator]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         customer = self.request.user
-        items = CartItem.objects.filter(customer__user=customer)
+        items = CartItem.objects.filter(customer__user=customer).prefetch_related(
+            "product"
+        )
         return items
 
     def delete(self, request, *args, **kwargs):

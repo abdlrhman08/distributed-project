@@ -5,8 +5,13 @@ from django.db.models import Avg
 from rest_framework import serializers
 
 from authentication.serializers import UserSerializer
+from paymentservice.serializers import OrderSerializer
 from store.models import Product
-from store.serializers import PrivateProductSerializer, ProductSerializer
+from store.serializers import (
+    PathField,
+    PrivateProductSerializer,
+    ProductSerializer,
+)
 
 from .models import CartItem, Customer, Seller, Stats
 
@@ -39,21 +44,42 @@ class CustomerRegistrationSerializer(serializers.ModelSerializer):
 
 
 class CustomerReadUpdateDeleteSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = UserSerializer()
+    order_set = OrderSerializer(read_only=True, many=True)
 
     class Meta:
         model = Customer
-        fields = ["user", "avatar", "address", "wishlist"]
+        fields = ["user", "avatar", "address", "wishlist", "order_set"]
         read_only_fields = ["wishlist"]
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user")
+        user = instance.user
+
+        user.username = user_data.get("username", user.username)
+        user.first_name = user_data.get("first_name", user.first_name)
+        user.last_name = user_data.get("last_name", user.last_name)
+        user.email = user_data.get("email", user.email)
+
+        password = user_data.get("password", None)
+        if password:
+            user.set_password(password)
+        user.save()
+
+        instance.avatar = validated_data.get("avatar", instance.avatar)
+        instance.address = validated_data.get("address", instance.address)
+        instance.save()
+        return instance
 
 
 class SellerSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     products = ProductSerializer(source="product_set", read_only=True, many=True)
+    avatar = serializers.SerializerMethodField()
 
     class Meta:
         model = Seller
-        fields = ["user", "company_name", "location", "products"]
+        fields = ["user", "company_name", "location", "products", "avatar"]
 
     def validate(self, data):
         self.user = self.context["request"].user
@@ -70,6 +96,10 @@ class SellerSerializer(serializers.ModelSerializer):
             company_name=validated_data["company_name"],
             location=validated_data["location"],
         )
+
+    def get_avatar(self, obj):
+        customer = obj.user.customer
+        return customer.avatar
 
 
 class PrivateSellerSerializer(SellerSerializer):
@@ -103,12 +133,47 @@ class WishlistProductSerializer(serializers.Serializer):
         return product
 
 
+class CartListSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        total_price = sum(
+            cart_item.product.price * cart_item.quantity for cart_item in data
+        )
+        serialized_data = super().to_representation(data)
+        new_data = {"cart": serialized_data, "total_price": total_price}
+        return new_data
+
+    @property
+    def data(self):
+        """
+        The same implementation of BaseSerializer to skip the implementation
+        of ListSerializer
+        """
+
+        if not hasattr(self, "_data"):
+            if self.instance is not None and not getattr(self, "_errors", None):
+                self._data = self.to_representation(self.instance)
+            elif hasattr(self, "_validated_data") and not getattr(
+                self, "_errors", None
+            ):
+                self._data = self.to_representation(self.validated_data)
+            else:
+                self._data = self.get_initial()
+        return self._data
+
+
 class CartItemListCreateSerializer(serializers.ModelSerializer):
+    product = PathField(
+        view_name="store:products_retrieve", queryset=Product.objects.all()
+    )
+    product_details = serializers.SerializerMethodField()
+
     class Meta:
         model = CartItem
-        fields = ["id", "customer", "product", "quantity"]
+        fields = ["id", "customer", "product", "quantity", "product_details"]
         read_only_fields = ["id", "customer"]
         validators = [validate_quantity]
+
+        list_serializer_class = CartListSerializer
 
     def create(self, validated_data):
         try:
@@ -119,8 +184,13 @@ class CartItemListCreateSerializer(serializers.ModelSerializer):
                 {"details": "The customer already has this product in his cart"}
             )
 
+    def get_product_details(self, obj):
+        return ProductSerializer(obj.product).data
+
 
 class CartItemUpdateDeleteSerializer(serializers.ModelSerializer):
+    product = PathField(view_name="store:products_retrieve", read_only=True)
+
     class Meta:
         model = CartItem
         fields = ["id", "customer", "product", "quantity"]
