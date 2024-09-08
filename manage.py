@@ -4,7 +4,6 @@
 import os
 import sys
 
-# testing webhooks
 def main():
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "distributed_project.settings")
