@@ -1,0 +1,12 @@
+image: ubuntu
+
+stages:
+  - name: formatting
+    commands:
+      - echo hello
+      - ls -ll
+
+  - name: another stage
+    commands:
+      - echo hello from another stage
+
