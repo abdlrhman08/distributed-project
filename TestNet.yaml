@@ -8,5 +8,5 @@ stages:
 
   - name: another stage
     commands:
-      - echo hello from another stage
+      - echo hello from another stage hh
 
