@@ -3,7 +3,7 @@ image: ubuntu
 stages:
   - name: formatting
     commands:
-      - echo hellooo
+      - echo hello
       - ls -ll
 
   - name: another stage
